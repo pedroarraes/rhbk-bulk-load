@@ -1,14 +1,15 @@
 # RHBK Bulk Load
-This project is designed to facilitate bulk user creation in Red Hat Build of Keycloak (RHBK), enabling extensive performance testing of the system.
+Questo progetto è progettato per facilitare la creazione di utenti in massa in Red Hat Build of Keycloak (RHBK), consentendo test di prestazioni estensive del sistema.
 
-## Important
-This project is not affiliated with Red Hat and is not an official endeavor. It's a personal initiative designed to assist me in testing RHBK. Use this project at your own risk. It is not recommended for use in a production environment.
+## Importante
+Questo progetto non è affiliato a Red Hat e non è un'iniziativa ufficiale. È un'iniziativa personale progettata per aiutarmi a testare RHBK. Usa questo progetto a tuo rischio. Non è consigliato per l'uso in un ambiente di produzione.
 
-## Requirements
+
+## Requisiti
 * OpenJDK Runtime Environment (Red_Hat-21.0.2.0.13-1) (build 21.0.2+13-LTS)
 * Apache Maven 3.9.6 (Red Hat 3.9.6-6)
 * podman version 5.0.3
-* OpenShift 4.14 or latest
+* OpenShift 4.14 
 * RHBK 24-12
 * oc client
 * Suported databases:
@@ -18,21 +19,21 @@ This project is not affiliated with Red Hat and is not an official endeavor. It'
     * Oracle
     * Microsoft SQL Server
 
-## Sumary
-* [Compile and Run](#compile-and-run)
-    * [Compiling source code](#compiling-source-code)
-    * [Build a container image](#build-a-container-image)
-    * [Running the container](#running-the-container)
-        * [Runnig the container using podman](#runnig-the-container-using-podman)
-        * [Runnig the container using OpenShift](#runnig-the-container-using-openshift)
-* [Using api to create users](#using-api-to-create-users)
-* [Using api to drop users](#using-api-to-drop-users)
+## Sommario
+* [Compilando e Executando](#compilando-e-executando)
+    * [Compilando o código fonte](#compilando-o-código-fonte)
+    * [Construindo a imagem do contêiner](#construindo-a-imagem-do-contêiner)
+    * [Executando o contêiner](#executando-o-contêiner)
+* [Executando o contêiner utilizando podman](#executando-o-contêiner-utilizando-podman)
+* [Executando o contêiner utilizando OpenShift](#executando-o-contêiner-utilizando-openshift)
 
-## Compile and Run
-This project is architected to operate within a container. The following instructions will navigate you through the process of compiling the source code, constructing a container image, and executing the container. If you prefer you can take the image from quay.io and skip the steps of compiling the source code and building the container image.
 
-### Compiling source code
-Now that you have the necessary tools installed, you can compile the source code. To do so, execute the following command:
+## Compilare ed Eseguire
+Questo progetto è architettato per funzionare all'interno di un contenitore. Le seguenti istruzioni ti guideranno attraverso il processo di compilazione del codice sorgente, costruzione di un'immagine del contenitore ed esecuzione del contenitore. Se preferisci, puoi prendere l'immagine da quay.io e saltare i passaggi di compilazione del codice sorgente e costruzione dell'immagine del contenitore.
+
+
+### Compilazione del codice sorgente
+Ora che hai gli strumenti necessari installati, puoi compilare il codice sorgente. Per farlo, esegui il seguente comando:
 ```shell
 $ mvn clean package -Pnative
 ```
@@ -167,8 +168,8 @@ Finished generating 'rhbk-bulk-load-1.0.0-SNAPSHOT-runner' in 1m 20s.
 [INFO] Finished at: 2024-07-29T16:03:58-03:00
 [INFO] ------------------------------------------------------------------------
 ```
-### Build a container image
-Now lets build the container image using the following command:
+### Costruire un'immagine del contenitore
+Ora costruiamo l'immagine del contenitore utilizzando il seguente comando:
 ```shell
 $ podman build -f src/main/docker/Dockerfile.native -t quay.io/parraes/rhbk-bulk-load:v0.0.1 .
 ```
@@ -196,10 +197,10 @@ COMMIT quay.io/parraes/rhbk-bulk-load:v0.0.1
 Successfully tagged quay.io/parraes/rhbk-bulk-load:v0.0.1
 bd13282927f95dd19714ba92e38b770529c31f8aff0d971fb18b24123b4644ef
 ```
-### Running the container
-Now lets run the container, you can choose between podman or OpenShift to run.
+### Esecuzione del contenitore
+Ora eseguiamo il contenitore, puoi scegliere tra podman o OpenShift per l'esecuzione.
 
-#### Runnig the container using podman
+#### Esecuzione del contenitore utilizzando podman
 ```shell
 $ podman run -d \
     -p 9000:9000 \
@@ -211,41 +212,41 @@ $ podman run -d \
     --name rhbk-bulk-load-multi-db  \
     quay.io/parraes/rhbk-bulk-load:v0.0.1
 ```
-* CONFIG.DATASOURCE.DRIVER is the driver of the database, it can be postgres, mysql, mariadb, oracle or mssql.
-* CONFIG.DATASOURCE.URL is the url of the database, it can be jdbc:postgresql://hostname:port_number/database_name, jdbc:mysql://hostname:port_number/database_name, jdbc:mariadb://hostname:port_number/database_name, jdbc:oracle:thin:@hostname:port_number:database_name or jdbc:sqlserver://hostname:port_number;databaseName=database_name.
-* CONFIG.DATASOURCE.USERNAME is the username of the database.
-* CONFIG.DATASOURCE.PASSWORD is the password of the database.
-* CONFIG.KEYCLOAK.REALM is the realm of the RHBK.
+* CONFIG.DATASOURCE.DRIVER è il driver del database, può essere postgres, mysql, mariadb, oracle o mssql.
+* CONFIG.DATASOURCE.URL è l'URL del database, può essere jdbc:postgresql://hostname:port_number/database_name, jdbc:mysql://hostname:port_number/database_name, jdbc:mariadb://hostname:port_number/database_name, jdbc:oracle:thin:@hostname:port_number:database_name o jdbc:sqlserver://hostname:port_number;databaseName=database_name.
+* CONFIG.DATASOURCE.USERNAME è il nome utente del database.
+* CONFIG.DATASOURCE.PASSWORD è la password del database.
+* CONFIG.KEYCLOAK.REALM è il realm del RHBK.
 
-#### Runnig the container using OpenShift
-Now lets run the container using OpenShift, you can use the following command to create a deployment and a service:
+#### Esecuzione del contenitore utilizzando OpenShift
+Ora eseguiamo il contenitore utilizzando OpenShift, puoi usare il seguente comando per creare un deployment e un servizio:
 ```shell
 $ oc new-app --name=sso-bulk-load-multi-db \
     -e CONFIG.DATASOURCE.DRIVER="<driver-name>" \
     -e CONFIG.DATASOURCE.URL="<jdbc_url>" \
     -e CONFIG.DATASOURCE.USERNAME="<db_username>" \
     -e CONFIG.DATASOURCE.PASSWORD="<db_password>" \
-    -e CONFIG.KEYCLOAK.REALM="<sso_realm>" \
+    -e CONFIG.KEYCLOAK.REALM="<rhbk_realm>" \
     quay.io/parraes/rhbk-bulk-load:v0.0.1
 ```
-* CONFIG.DATASOURCE.DRIVER is the driver of the database, it can be postgres, mysql, mariadb, oracle or mssql.
-* CONFIG.DATASOURCE.URL is the url of the database, it can be jdbc:postgresql://hostname:port_number/database_name, jdbc:mysql://hostname:port_number/database_name, jdbc:mariadb://hostname:port_number/database_name, jdbc:oracle:thin:@hostname:port_number:database_name or jdbc:sqlserver://hostname:port_number;databaseName=database_name.
-* CONFIG.DATASOURCE.USERNAME is the username of the database.
-* CONFIG.DATASOURCE.PASSWORD is the password of the database.
-* CONFIG.KEYCLOAK.REALM is the realm of the RHBK
+* CONFIG.DATASOURCE.DRIVER è il driver del database, può essere postgres, mysql, mariadb, oracle o mssql.
+* CONFIG.DATASOURCE.URL è l'URL del database, può essere jdbc:postgresql://hostname:port_number/database_name, jdbc:mysql://hostname:port_number/database_name, jdbc:mariadb://hostname:port_number/database_name, jdbc:oracle:thin:@hostname:port_number:database_name o jdbc:sqlserver://hostname:port_number;databaseName=database_name.
+* CONFIG.DATASOURCE.USERNAME è il nome utente del database.
+* CONFIG.DATASOURCE.PASSWORD è la password del database.
+* CONFIG.KEYCLOAK.REALM è il realm del RHBK.
 
-Expose the service to the external network:
+Esporre il servizio alla rete esterna:
 ```shell
 oc expose svc/rhbk-bulk-load-multi-db
 ```
 
-Get the route of the service:
+Ottieni la rotta del servizio:
 ```shell
 oc get route rhbk-bulk-load-multi-db
 ```
 
-## Using api to create users
-Now lets using the api to create users, you can use the following command to create users:
+## Utilizzo dell'API per creare utenti
+Ora utilizziamo l'API per creare utenti, puoi usare il seguente comando per creare utenti:
 ```shell
 curl -X 'POST' \
   'http://<hostname>:<port>/bulk/insert/10000' \
@@ -253,16 +254,14 @@ curl -X 'POST' \
   -d ''     
 ```
 
-This command will create 10000 users in the RHBK.
+Questo comando creerà 10000 utenti nel RHBK.
 
-## Using api to drop users
-Now lets using the api to drop users, you can use the following command to drop users:
+## Utilizzo dell'API per eliminare gli utenti
+Ora utilizziamo l'API per eliminare gli utenti, puoi usare il seguente comando per eliminare gli utenti:
 ```shell
 curl -X 'DELETE' \
   'http://<hostname>:<port>bulk/delete/admin' \
   -H 'accept: text/plain'    
 ```
-All users will be dropped from the RHBK, except the admin user. 
+Tutti gli utenti saranno eliminati dal RHBK, ad eccezione dell'utente amministratore.
 ``
-
-
